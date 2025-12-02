@@ -13,13 +13,13 @@ type Dial struct {
 }
 
 func main() {
-	if err := processRotationsInput("input"); err != nil {
+	if err := processInput("input"); err != nil {
 		fmt.Println("couldn't process rotations input file")
 		os.Exit(1)
 	}
 }
 
-func processRotationsInput(filename string) error {
+func processInput(filename string) error {
 	file, err := os.Open(filename)
 	if err != nil {
 		return fmt.Errorf("couldn't read input file: %w", err)
@@ -38,11 +38,25 @@ func processRotationsInput(filename string) error {
 			return fmt.Errorf("couldn't parse rotation: %w", err)
 		}
 
-		dial.rotate(direction, quantity)
-		dial.checkAndCountZero()
+		dial.processRotation(direction, quantity)
 	}
+
 	fmt.Printf("Total zero count: %d\n", dial.zeroCount)
 	return nil
+}
+
+func (dial *Dial) processRotation(direction string, quantity int) {
+	for range quantity {
+		if direction == "L" {
+			dial.position = (dial.position - 1 + 100) % 100
+		}
+		if direction == "R" {
+			dial.position = (dial.position + 1) % 100
+		}
+		if dial.position == 0 {
+			dial.zeroCount++
+		}
+	}
 }
 
 func parseRotation(line string) (string, int, error) {
@@ -53,28 +67,4 @@ func parseRotation(line string) (string, int, error) {
 	}
 
 	return direction, quantity, nil
-}
-
-func (dial *Dial) rotate(direction string, quantity int) {
-	if direction == "L" {
-		dial.rotateLeft(quantity)
-	}
-
-	if direction == "R" {
-		dial.rotateRight(quantity)
-	}
-}
-
-func (dial *Dial) rotateLeft(quantity int) {
-	dial.position = ((dial.position-quantity)%100 + 100) % 100
-}
-
-func (dial *Dial) rotateRight(quantity int) {
-	dial.position = (dial.position + quantity) % 100
-}
-
-func (dial *Dial) checkAndCountZero() {
-	if dial.position == 0 {
-		dial.zeroCount++
-	}
 }
