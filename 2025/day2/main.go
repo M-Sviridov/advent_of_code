@@ -46,7 +46,7 @@ func processInput(filename string) error {
 
 			for i := startID; i <= endID; i++ {
 				toStringID := strconv.Itoa(i)
-				if isRepeatedTwice(toStringID) {
+				if isRepeated(toStringID) {
 					sumInvalidID += i
 				}
 			}
@@ -56,16 +56,20 @@ func processInput(filename string) error {
 	return nil
 }
 
-func isRepeatedTwice(s string) bool {
-	length := len(s)
+func isRepeated(s string) bool {
+	l := len(s)
 
-	if length == 0 || length%2 != 0 {
-		return false
+	for i := 1; i <= l/2; i++ {
+		block := s[0:i]
+		if l == 0 || l%i != 0 {
+			continue
+		}
+
+		repeated := strings.Repeat(block, l/i)
+		if repeated == s {
+			return true
+		}
 	}
 
-	mid := length / 2
-	firstHalf := s[:mid]
-	secondHalf := s[mid:]
-
-	return firstHalf == secondHalf
+	return false
 }
